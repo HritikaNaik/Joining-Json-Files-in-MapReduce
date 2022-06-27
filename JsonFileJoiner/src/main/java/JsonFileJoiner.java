@@ -43,15 +43,16 @@ public class JsonFileJoiner extends Configured implements Tool{
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(NullWritable.class);
         job.setOutputValueClass(Text.class);
-        Path outputPath = new Path(args[4]);
+        Path outputPath = new Path(args[4]);//The last command line argument is the output path
 
         cleanHDFSOutPath(outputPath); //Incase the output path already has a value from a previous iteration, it will have to be deleted
 
+        //Input files make uo n-1 of the n arguments given in command line, and so we read them as such
         MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class,MyMapper.class);
         MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class,MyMapper.class);
-        //MultipleInputs.addInputPath(job, new Path(args[2]), TextInputFormat.class,MyMapper.class);
+        MultipleInputs.addInputPath(job, new Path(args[2]), TextInputFormat.class,MyMapper.class);
         MultipleInputs.addInputPath(job, new Path(args[3]), TextInputFormat.class,MyMapper.class);
-        FileOutputFormat.setOutputPath(job, outputPath);
+        FileOutputFormat.setOutputPath(job, outputPath)
 
         return job.waitForCompletion(true) ? 0 : 1;
     }
@@ -60,7 +61,6 @@ public class JsonFileJoiner extends Configured implements Tool{
         try {
             Configuration conf = getConf();
             FileSystem hdfs = FileSystem.get(URI.create(pathToDelete.toString()),conf);
-            //g_activityLogger.info("Cleaning OutPut Path: " + pathToDelete.toString());
             if (hdfs.exists(pathToDelete)) {
                 hdfs.delete(pathToDelete, true);
             }
